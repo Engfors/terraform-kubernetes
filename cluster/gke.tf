@@ -44,4 +44,9 @@ resource "google_container_node_pool" "engineering_preemptible_nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
   }
+  
+  depends_on = [
+    google_project_service.container,
+    google_project_service.compute
+  ]
 }
