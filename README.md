@@ -26,7 +26,17 @@ environment variables__:
 The pipeline will output the Kubernetes credentials for consumption by the Helm
 charts.
 
-# Step 2: Deploy Consul backend for Vault
+# Step 2: Update Cluster
+
+Update the toggle in the cluster to expand it to multiple nodes. In the
+**cluster** pipeline, set the `enable_consul_and_vault` variable to `true`.
+This scales the cluster to 3 nodes and triggers the Consul and Vault pipelines
+to deploy Consul and Vault.
+
+If you set `enable_consul_and_vault` to `false`, it scales down the cluster to 1
+node and deletes the Consul and Vault deployment.
+
+# Step 3: Deploy Consul backend for Vault
 
 In Terraform Cloud, you'll need to specify a __Run Trigger__ that uses the
 Kubernetes cluster deployment's workspace. The Consul backend deployment will
@@ -40,7 +50,7 @@ We don't have a Helm chart repository so its reference exists as a submodule.
 Specify variables in `variables.tf` within the Terraform Cloud workspace for the
 Consul deployment.
 
-# Step 3: Deploy Vault
+# Step 4: Deploy Vault
 
 In Terraform Cloud, you'll need to specify a __Run Trigger__ that uses the
 Consul deployment's workspace. This is because this Vault configuration needs to
@@ -53,12 +63,8 @@ don't have a Helm chart repository so its reference exists as a submodule.
 Specify variables in `variables.tf` within the Terraform Cloud workspace for the
 Vault deployment.
 
-# Step 4: Update Cluster
+# Step 5: Verification
 
-Update the toggle in the cluster to expand it to multiple nodes. In the
-**cluster** pipeline, set the `enable_consul_and_vault` variable to `true`.
-This scales the cluster to 3 nodes and triggers the Consul and Vault pipelines
-to deploy Consul and Vault.
+gcloud container clusters get-credentials  helm-cluster --zone us-central1-a
 
-If you set `enable_consul_and_vault` to `false`, it scales down the cluster to 1
-node and deletes the Consul and Vault deployment.
+kubectl port-forward -n secrets consul-server-0 8080:8500
